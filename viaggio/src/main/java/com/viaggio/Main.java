@@ -9,7 +9,11 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        TripManager tripManager = new TripManager();
+
+        String orsApiKey = System.getenv("eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijk0NTNjZThjNzIwMzQyMjZhMTUxY2YzZDFhYTkzZmExIiwiaCI6Im11cm11cjY0In0=");
+
+
+        TripManager tripManager = new TripManager(orsApiKey);
 
         System.out.println("=== GESTIONE VIAGGIO CONCATENATO ===\n");
 

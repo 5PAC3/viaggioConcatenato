@@ -12,11 +12,25 @@ public class TripManager {
     private final GeoService geoService;
     private final WeatherService weatherService;
     private final DistanceCalculator distanceCalculator;
+    private final RouteService routeService;
 
-    public TripManager() {
+    /**
+     * Costruttore con API key di OpenRouteService.
+     * Se apiKey è null o vuota, le distanze vengono calcolate
+     * con la formula Haversine (linea d'aria).
+     */
+    public TripManager(String orsApiKey) {
         this.geoService = new GeoService();
         this.weatherService = new WeatherService();
         this.distanceCalculator = new DistanceCalculator();
+        this.routeService = (orsApiKey != null && !orsApiKey.isBlank())
+                ? new RouteService(orsApiKey)
+                : null;
+    }
+
+    /** Costruttore senza API key: usa distanza in linea d'aria. */
+    public TripManager() {
+        this(null);
     }
 
     public void aggiungiTappa(String nomeCitta) throws Exception {
@@ -45,7 +59,7 @@ public class TripManager {
             boolean isOrigine = (precedente == null);
 
             if (precedente != null) {
-                km = distanceCalculator.calcolaDistanzaArrotondata(precedente, city.getCoordinate());
+                km = calcolaKm(precedente, city.getCoordinate());
             }
 
             risultato.add(new Tappa(city, km, isOrigine));
@@ -55,13 +69,20 @@ public class TripManager {
         return risultato;
     }
 
+    private double calcolaKm(Coordinate from, Coordinate to) {
+        if (routeService != null) {
+            return routeService.calcolaDistanzaStrada(from, to);
+        }
+        return distanceCalculator.calcolaDistanzaArrotondata(from, to);
+    }
+
     public double getKmTotali() {
         double totale = 0;
         Coordinate precedente = null;
 
         for (City city : tappe) {
             if (precedente != null) {
-                totale += distanceCalculator.calcolaDistanzaArrotondata(precedente, city.getCoordinate());
+                totale += calcolaKm(precedente, city.getCoordinate());
             }
             precedente = city.getCoordinate();
         }
