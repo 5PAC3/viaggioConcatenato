@@ -45,7 +45,7 @@ public class TripManager {
         System.out.println("\nCaricamento meteo...");
         for (City city : tappe) {
             System.out.println("Meteo per " + city.getNome() + "...");
-            var meteo = weatherService.getMeteo(city.getCoordinate());
+            var meteo = weatherService.getMeteo(city.getNome());
             city.setMeteo(meteo);
         }
     }
